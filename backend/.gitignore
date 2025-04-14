@@ -1,0 +1,73 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environment
+env/
+venv/
+.venv/
+
+# Environment variables and secrets
+.env
+.env.*
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# macOS-specific files
+.DS_Store
+
+# Windows-specific files
+Thumbs.db
+
+# IDE settings
+.vscode/
+.idea/
+
+# Test and coverage outputs
+htmlcov/
+.coverage
+.coverage.*
+*.coveragerc
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Logs and temporary files
+*.log
+*.cache
+
+# Database files (if using SQLite for testing)
+test_db.db
+
+# FastAPI-specific outputs
+site/
+docs_build/
+site_build/
+
+# Pipenv and Poetry lock files (if using them)
+Pipfile.lock
+poetry.lock
+
+# Pytest cache and other testing artifacts
+.pytest_cache/
+
+# Netlify or other deployment artifacts
+.netlify/
+
+# Temporary archives
+archive.zip
+docs.zip
+
+# vim swap files
+*~
+.*.sw?
+
+# Ignore specific tools like mypy or pylint cache directories
+.mypy_cache/
+.pylint_cache/
+
