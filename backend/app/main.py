@@ -1,14 +1,15 @@
 from fastapi import FastAPI
 from app.middleware.jwt_auth_middleware import JWTAuthMiddleware
+from app.routes import user
+from app.config.settings import SECRET_KEY, ALGORITHM
+
 
 app = FastAPI()
 
 app.add_middleware(JWTAuthMiddleware) # minden /api endpointet védett
 
-@app.get("/xyz")
-async def public_route():
-    return {"message": "This is a public route"}
+app.include_router(user.router)
 
-@app.get("/api/xyz")
-async def protected_route():
-    return {"message": "This is a protected route"}
+@app.get("/")
+def root():
+    return {"message": "API elérhető"}
