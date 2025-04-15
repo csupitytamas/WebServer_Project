@@ -1,6 +1,13 @@
 from sqlalchemy import Column, Integer, String, TIMESTAMP
 from app.config.db import Base  # gondoskodj róla, hogy Base innen legyen importálva
 
+"""
+A modelben az adatbázis táblák struktúráját definiáljuk.
+A SQLAlchemy ORM segítségével definiáljuk a táblákat és azok mezőit.
+A Felhasznalo tábla a felhasználók adatait tárolja.
+A Felhasznalo tábla mezői:
+"""
+
 class Felhasznalo(Base):
     __tablename__ = 'felhasznalo'
 
