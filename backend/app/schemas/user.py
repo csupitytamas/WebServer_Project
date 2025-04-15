@@ -2,6 +2,18 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
 
+"""
+A Schemakban a bemeneti és kimeneti adatokat definiáljuk.
+A Pydantic könyvtár segítségével definiáljuk a bemeneti és kimeneti adatokat.
+A bemeneti adatok a felhasználó által megadott adatok, amelyeket a FastAPI automatikusan validál.
+A kimeneti adatok a válasz, amelyet az API visszaad a felhasználónak.
+A FelhasznaloCreate a felhasználó regisztrációjához szükséges adatokat tartalmazza.
+A FelhasznaloLogin a felhasználó bejelentkezéséhez szükséges adatokat tartalmazza.
+A FelhasznaloOut a felhasználó adatait tartalmazza, amelyeket az API visszaad a felhasználónak.
+
+"""
+
+
 class FelhasznaloCreate(BaseModel):
     nev: str
     email: EmailStr
@@ -19,4 +31,4 @@ class FelhasznaloOut(BaseModel):
     bejelentkezes_idopontja: Optional[datetime]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
