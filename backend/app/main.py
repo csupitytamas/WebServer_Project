@@ -1,9 +1,13 @@
-from fastapi import FastAPI, Path
-from pydantic import BaseModel
-import oracledb
-from dotenv import load_dotenv
 import os
+import oracledb
+from fastapi import FastAPI, Path
+from passlib.context import CryptContext
+from pydantic import BaseModel
+from dotenv import load_dotenv
+from http.client import HTTPException
 
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 load_dotenv()
 app = FastAPI()
 
@@ -49,6 +53,40 @@ def list_felhasznalok():
     return {"felhasznalok": [
         {"id": r[0], "nev": r[1], "email": r[2], "szerep": r[3]} for r in eredmeny
     ]}
+
+
+
+@app.post("/register")
+def register(user: User):
+    hashed_password = pwd_context.hash(user.jelszo)
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                INSERT INTO felhasznalo (nev, email, jelszo, szerep, bejelentkezes_idopontja)
+                VALUES (:1, :2, :3, :4, SYSDATE)
+            """, [user.nev, user.email, hashed_password, user.Szerep])
+            conn.commit()
+
+            cur.execute("SELECT MAX(u_id) FROM felhasznalo")
+            uj_id = cur.fetchone()[0]
+
+    return {"message": "A regisztráció sikeres", "user_id": uj_id}
+
+
+@app.post("/login")
+def login(email: str, password: str):
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT jelszo FROM felhasznalo WHERE email = :email", [email])
+            row = cur.fetchone()
+            if not row:
+                raise HTTPException(status_code=400, detail="Invalid email or password")
+
+            stored_password = row[0]
+            if not pwd_context.verify(password, stored_password):
+                raise HTTPException(status_code=400, detail="Invalid email or password")
+
+    return {"message": "A bejelentkezés sikeres", "email": email}
 
 
 @app.get("/get_user/{user_id}")
