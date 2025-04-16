@@ -71,3 +71,4 @@ docs.zip
 .mypy_cache/
 .pylint_cache/
 
+backend/wallet/
