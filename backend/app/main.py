@@ -1,16 +1,22 @@
 import os
 import oracledb
-from fastapi import FastAPI, Path
+from fastapi import FastAPI, Path,HTTPException, Security
 from passlib.context import CryptContext
 from pydantic import BaseModel
 from dotenv import load_dotenv
-from http.client import HTTPException
+from fastapi import Depends
+from app.utils.jwt_helper import decode_jwt
+from app.middleware.jwt_auth_middleware import JWTAuthMiddleware
+from app.utils.jwt_helper import create_access_token, verify_password
+from fastapi.security import HTTPBearer
+from fastapi.openapi.models import APIKey
+from fastapi.openapi.utils import get_openapi
 
-
+security = HTTPBearer()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 load_dotenv()
 app = FastAPI()
-
+app.add_middleware(JWTAuthMiddleware)
 class User(BaseModel):
     nev: str
     email: str
@@ -56,7 +62,7 @@ def list_felhasznalok():
 
 
 
-@app.post("/register")
+@app.post("/auth/register")
 def register(user: User):
     hashed_password = pwd_context.hash(user.jelszo)
     with get_connection() as conn:
@@ -73,23 +79,28 @@ def register(user: User):
     return {"message": "A regisztráció sikeres", "user_id": uj_id}
 
 
-@app.post("/login")
+@app.post("/auth/login")
 def login(email: str, password: str):
     with get_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT jelszo FROM felhasznalo WHERE email = :email", [email])
+            cur.execute("SELECT u_id, jelszo FROM felhasznalo WHERE email = :1", [email])
             row = cur.fetchone()
             if not row:
                 raise HTTPException(status_code=400, detail="Invalid email or password")
 
-            stored_password = row[0]
-            if not pwd_context.verify(password, stored_password):
+            user_id, hashed_password = row
+            if not verify_password(password, hashed_password):
                 raise HTTPException(status_code=400, detail="Invalid email or password")
 
-    return {"message": "A bejelentkezés sikeres", "email": email}
+    # Token létrehozása az "alannyal" (user_id)
+    token = create_access_token({"sub": str(user_id)})
 
+    return {
+        "access_token": token,
+        "token_type": "bearer"
+    }
 
-@app.get("/get_user/{user_id}")
+@app.get("/api/get_user/{user_id}")
 def get_user(user_id: int = Path(..., description="A felhasználó azonosítója")):
     with get_connection() as conn:
         with conn.cursor() as cur:
@@ -100,7 +111,7 @@ def get_user(user_id: int = Path(..., description="A felhasználó azonosítója
     return {"user_id": user_id, "nev": row[0], "email": row[1], "jelszo": row[2], "szerep": row[3]}
 
 
-@app.get("/get_by_name")
+@app.get("/api/get_by_name")
 def get_by_name(name: str):
     with get_connection() as conn:
         with conn.cursor() as cur:
@@ -111,7 +122,7 @@ def get_by_name(name: str):
     return {"user_id": row[0], "nev": row[1], "email": row[2], "jelszo": row[3], "szerep": row[4]}
 
 
-@app.post("/add_user")
+@app.post("/api/add_user")
 def add_user(user: User):
     with get_connection() as conn:
         with conn.cursor() as cur:
@@ -126,7 +137,7 @@ def add_user(user: User):
 
     return {"message": "Felhasználó hozzáadva", "user_id": uj_id}
 
-@app.put("/update_user/{user_id}")
+@app.put("/api/update_user/{user_id}")
 def update_user(user_id: int, updated_user: User):
     with get_connection() as conn:
         with conn.cursor() as cur:
@@ -146,7 +157,7 @@ def update_user(user_id: int, updated_user: User):
     return {"message": "Felhasználó frissítve"}
 
 
-@app.delete("/delete_user/{user_id}")
+@app.delete("/api/delete_user/{user_id}")
 def delete_user(user_id: int):
     with get_connection() as conn:
         with conn.cursor() as cur:
@@ -157,3 +168,34 @@ def delete_user(user_id: int):
             cur.execute("DELETE FROM felhasznalo WHERE u_id = :id", [user_id])
             conn.commit()
     return {"message": "Felhasználó törölve"}
+
+@app.get("/api/protected", dependencies=[Depends(security)])
+def protected_route(payload: dict = Depends(decode_jwt)):
+    return {"message": "Ez egy védett végpont", "user": payload["sub"]}
+
+
+
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = get_openapi(
+        title="WebServer Projekt API",
+        version="1.0.0",
+        description="JWT alapú hitelesítéssel védett API",
+        routes=app.routes,
+    )
+    openapi_schema["components"]["securitySchemes"] = {
+        "BearerAuth": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT"
+        }
+    }
+    for path in openapi_schema["paths"].values():
+        for method in path.values():
+            method["security"] = [{"BearerAuth": []}]
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+app.openapi = custom_openapi
