@@ -13,9 +13,9 @@ def register(user: User):
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("""
-                INSERT INTO felhasznalo (nev, email, jelszo, szerep, bejelentkezes_idopontja)
+                INSERT INTO felhasznalo (nev, email, jelszo, bejelentkezes_idopontja)
                 VALUES (:1, :2, :3, :4, SYSDATE)
-            """, [user.nev, user.email, hashed_password, user.Szerep])
+            """, [user.nev, user.email, hashed_password])
             conn.commit()
 
             cur.execute("SELECT MAX(u_id) FROM felhasznalo")
@@ -26,7 +26,6 @@ def register(user: User):
         "message": "A regisztráció sikeres",
         "user_id": uj_id,
         "access_token": token,
-        "token_type": "bearer"
     }
 
 @router.post("/auth/login")
@@ -46,5 +45,4 @@ def login(email: str, password: str):
     return {
         "message": "Sikeres bejelentkezés",
         "access_token": token,
-        "token_type": "bearer"
     }
