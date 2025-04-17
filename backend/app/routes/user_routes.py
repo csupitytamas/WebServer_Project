@@ -21,7 +21,7 @@ def get_user(user_id: int = Path(..., description="A felhasználó azonosítója
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT nev, email, jelszo, szerep FROM felhasznalo WHERE u_id = :id",
+                "SELECT nev, email, szerep FROM felhasznalo WHERE u_id = :id",
                 [user_id]
             )
             row = cur.fetchone()
@@ -31,8 +31,7 @@ def get_user(user_id: int = Path(..., description="A felhasználó azonosítója
         "user_id": user_id,
         "nev": row[0],
         "email": row[1],
-        "jelszo": row[2],
-        "szerep": row[3]
+        "szerep": row[2]
     }
 
 @router.get("/get_by_name")
@@ -40,7 +39,7 @@ def get_by_name(name: str):
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT u_id, nev, email, jelszo, szerep FROM felhasznalo WHERE nev = :name",
+                "SELECT u_id, nev, email, szerep FROM felhasznalo WHERE nev = :name",
                 [name]
             )
             row = cur.fetchone()
@@ -50,8 +49,7 @@ def get_by_name(name: str):
         "user_id": row[0],
         "nev": row[1],
         "email": row[2],
-        "jelszo": row[3],
-        "szerep": row[4]
+        "szerep": row[3]
     }
 
 @router.put("/update_user/{user_id}")
