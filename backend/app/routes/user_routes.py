@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Path, Depends, HTTPException
 from typing import List
-from app.models.user_model import UserUpdate
+from app.schemas.user_schema import UserUpdate
 from app.db.connection import get_connection
 from app.schemas.user_schema import UserOut
 from app.utils.jwt_helper import decode_jwt
@@ -53,30 +53,44 @@ def get_by_name(name: str):
         "szerep": row[3]
     }
 
-@router.put("/api/update_user/{user_id}", dependencies=[Depends(decode_jwt)])
-def update_user(user_id: int, updated_user: UserUpdate):
+@router.put("/api/update_user/{user_id}")
+def update_user(user_id: int, updated_user: UserUpdate, payload: dict = Depends(decode_jwt)):
+    current_user_id = int(payload["sub"])
+    current_user_role = int(payload["role"])
+
+    if current_user_id != user_id and current_user_role != 1:
+        raise HTTPException(status_code=403, detail="Nincs jogosultságod más adatait módosítani.")
+
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT COUNT(*) FROM felhasznalo WHERE u_id = :id", [user_id])
             if cur.fetchone()[0] == 0:
-                raise HTTPException(status_code=404, detail="Nincs ilyen felhasználó")
+                return {"message": "Nincs ilyen felhasználó"}
 
             cur.execute("""
                 UPDATE felhasznalo
-                SET nev = :1, email = :2, jelszo = :3, szerep = :4
-                WHERE u_id = :5
-            """, [updated_user.nev, updated_user.email, updated_user.jelszo, updated_user.szerep, user_id])
+                SET nev = :1, email = :2
+                WHERE u_id = :3
+            """, [updated_user.nev, updated_user.email, user_id])
             conn.commit()
+
     return {"message": "Felhasználó frissítve"}
 
-@router.delete("/api/delete_user/{user_id}", dependencies=[Depends(decode_jwt)])
-def delete_user(user_id: int):
+@router.delete("/api/delete_user/{user_id}")
+def delete_user(user_id: int, payload: dict = Depends(decode_jwt)):
+    current_user_id = int(payload["sub"])
+    current_user_role = int(payload["role"])
+
+    if current_user_id != user_id and current_user_role != 1:
+        raise HTTPException(status_code=403, detail="Nincs jogosultságod törölni ezt a felhasználót.")
+
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT COUNT(*) FROM felhasznalo WHERE u_id = :id", [user_id])
             if cur.fetchone()[0] == 0:
-                raise HTTPException(status_code=404, detail="Nincs ilyen felhasználó")
+                return {"message": "Nincs ilyen felhasználó"}
 
             cur.execute("DELETE FROM felhasznalo WHERE u_id = :id", [user_id])
             conn.commit()
+
     return {"message": "Felhasználó törölve"}
