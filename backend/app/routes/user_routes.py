@@ -1,22 +1,21 @@
+from typing import List
 from fastapi import APIRouter, Path
 from app.models.user_model import User
 from app.db.connection import get_connection
+from app.schemas.user_schema import UserOut
 
 router = APIRouter()
 
-@router.get("/felhasznalok")
-def list_felhasznalok():
+@router.get("/users", response_model=List[UserOut])
+def list_users():
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT u_id, nev, email, szerep FROM felhasznalo")
             eredmeny = cur.fetchall()
-    return {
-        "felhasznalok": [
-            {"id": r[0], "nev": r[1], "email": r[2], "szerep": r[3]} for r in eredmeny
-        ]
-    }
-
-@router.get("/get_user/{user_id}")
+    return [
+        {"user_id": r[0], "nev": r[1], "email": r[2], "szerep": r[3]} for r in eredmeny
+    ]
+@router.get("/api/get_user/{user_id}")
 def get_user(user_id: int = Path(..., description="A felhasználó azonosítója")):
     with get_connection() as conn:
         with conn.cursor() as cur:
@@ -35,7 +34,7 @@ def get_user(user_id: int = Path(..., description="A felhasználó azonosítója
         "szerep": row[3]
     }
 
-@router.get("/get_by_name")
+@router.get("/api/get_by_name")
 def get_by_name(name: str):
     with get_connection() as conn:
         with conn.cursor() as cur:
@@ -54,7 +53,7 @@ def get_by_name(name: str):
         "szerep": row[4]
     }
 
-@router.put("/update_user/{user_id}")
+@router.put("/api/update_user/{user_id}")
 def update_user(user_id: int, updated_user: User):
     with get_connection() as conn:
         with conn.cursor() as cur:
@@ -70,7 +69,7 @@ def update_user(user_id: int, updated_user: User):
             conn.commit()
     return {"message": "Felhasználó frissítve"}
 
-@router.delete("/delete_user/{user_id}")
+@router.delete("/api/delete_user/{user_id}")
 def delete_user(user_id: int):
     with get_connection() as conn:
         with conn.cursor() as cur:

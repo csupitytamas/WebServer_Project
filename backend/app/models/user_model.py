@@ -5,3 +5,5 @@ class User(BaseModel):
     email: str
     jelszo: str
     Szerep: int
+
+

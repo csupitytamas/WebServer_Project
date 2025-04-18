@@ -1,21 +1,26 @@
 from fastapi import APIRouter, HTTPException
-from app.models.user_model import User
+from app.schemas.user_schema import UserCreate
 from app.utils.jwt_helper import create_access_token, verify_password
 from app.db.connection import get_connection
 from passlib.context import CryptContext
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 @router.post("/auth/register")
-def register(user: User):
-    hashed_password = pwd_context.hash(user.jelszo)
+def register(user: UserCreate):
+    # Ellenőrizd, van-e már ilyen email
     with get_connection() as conn:
         with conn.cursor() as cur:
+            cur.execute("SELECT COUNT(*) FROM felhasznalo WHERE email = :1", [user.email])
+            if cur.fetchone()[0] > 0:
+                raise HTTPException(status_code=400, detail="Ez az email már foglalt.")
+
+            hashed_pw = pwd_context.hash(user.jelszo)
+
             cur.execute("""
                 INSERT INTO felhasznalo (nev, email, jelszo, szerep, bejelentkezes_idopontja)
-                VALUES (:1, :2, :3, :4, SYSDATE)
-            """, [user.nev, user.email, hashed_password, user.Szerep])
+                VALUES (:1, :2, :3, 0, SYSDATE)
+            """, [user.nev, user.email, hashed_pw])
             conn.commit()
 
             cur.execute("SELECT MAX(u_id) FROM felhasznalo")
@@ -23,7 +28,7 @@ def register(user: User):
 
     token = create_access_token({"sub": str(uj_id)})
     return {
-        "message": "A regisztráció sikeres",
+        "message": "Sikeres regisztráció",
         "user_id": uj_id,
         "access_token": token,
         "token_type": "bearer"
