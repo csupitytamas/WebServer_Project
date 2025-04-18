@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from app.models.user_model import UserCreate, UserLogin, UserPublic
+from app.schemas.user_schema import UserCreate, UserLogin
 from app.utils.jwt_helper import create_access_token, verify_password
 from app.db.connection import get_connection
 from passlib.context import CryptContext
@@ -7,7 +7,7 @@ from passlib.context import CryptContext
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-@router.post("/auth/register", response_model=UserPublic)
+@router.post("/auth/register")
 def register(user: UserCreate):
     hashed_password = pwd_context.hash(user.jelszo)
     with get_connection() as conn:
@@ -25,12 +25,13 @@ def register(user: UserCreate):
             cur.execute("SELECT MAX(u_id) FROM felhasznalo")
             uj_id = cur.fetchone()[0]
 
-    return UserPublic(
-        user_id=uj_id,
-        nev=user.nev,
-        email=user.email,
-        szerep=0
-    )
+        token = create_access_token({"sub": str(uj_id)})
+        return {
+            "message": "A regisztráció sikeres",
+            "user_id": uj_id,
+            "access_token": token
+        }
+
 
 @router.post("/auth/login")
 def login(login_data: UserLogin):
@@ -48,5 +49,5 @@ def login(login_data: UserLogin):
     token = create_access_token({"sub": str(user_id)})
     return {
         "message": "Sikeres bejelentkezés",
-        "access_token": token
+        "access_token": token,
     }

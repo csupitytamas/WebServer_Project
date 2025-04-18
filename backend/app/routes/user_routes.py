@@ -22,7 +22,7 @@ def get_user(user_id: int = Path(..., description="A felhasználó azonosítója
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT nev, email, szerep FROM felhasznalo WHERE u_id = :id",
+                 "SELECT nev, email, szerep FROM felhasznalo WHERE u_id = :id",
                 [user_id]
             )
             row = cur.fetchone()
