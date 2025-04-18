@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from app.models.user_model import User
+from app.models.user_model import User, LoginUser
 from app.utils.jwt_helper import create_access_token, verify_password
 from app.db.connection import get_connection
 from passlib.context import CryptContext
@@ -29,16 +29,16 @@ def register(user: User):
     }
 
 @router.post("/auth/login")
-def login(email: str, password: str):
+def login(loginData: LoginUser):
     with get_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT u_id, jelszo FROM felhasznalo WHERE email = :email", [email])
+            cur.execute("SELECT u_id, jelszo FROM felhasznalo WHERE email = :email", [loginData.email])
             row = cur.fetchone()
             if not row:
                 raise HTTPException(status_code=400, detail="Hibás email vagy jelszó")
 
             user_id, hashed_password = row
-            if not verify_password(password, hashed_password):
+            if not verify_password(loginData.password, hashed_password):
                 raise HTTPException(status_code=400, detail="Hibás email vagy jelszó")
 
     token = create_access_token({"sub": str(user_id)})
