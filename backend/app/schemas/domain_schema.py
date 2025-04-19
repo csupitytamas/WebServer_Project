@@ -6,7 +6,7 @@ class DomainCreate(BaseModel):
     allapot: int
     domain_nev: str
     megtekintes: int
-    diju_id: Optional[int] = None
+    dij_id: Optional[int] = None
     u_id: Optional[int] = None
 
 # Frissítéshez (opcionális mezőkkel, ha nem akarja mindet megadni)
@@ -14,7 +14,7 @@ class DomainUpdate(BaseModel):
     allapot: Optional[int] = None
     domain_nev: Optional[str] = None
     megtekintes: Optional[int] = None
-    diju_id: Optional[int] = None
+    dij_id: Optional[int] = None
     u_id: Optional[int] = None
 
 # Kimeneti (response) séma listázáshoz vagy lekéréshez
@@ -24,7 +24,7 @@ class DomainOut(BaseModel):
     domain_nev: str
     megtekintes: int
     u_id: Optional[int] = None
-    diju_id: Optional[int] = None
+    dij_id: Optional[int] = None
 
     class Config:
         from_attributes = True

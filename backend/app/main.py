@@ -3,7 +3,7 @@ from fastapi.security import HTTPBearer
 from fastapi.openapi.utils import get_openapi
 from app.middleware.jwt_auth_middleware import JWTAuthMiddleware
 from app.utils.jwt_helper import decode_jwt
-from app.routes import auth, user_routes, domain_routes
+from app.routes import auth, user_routes, domain_routes,dijcsomag_routes
 from app.db.connection import get_connection
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -16,6 +16,7 @@ app.add_middleware(JWTAuthMiddleware)
 app.include_router(auth.router)
 app.include_router(user_routes.router)
 app.include_router(domain_routes.router)
+app.include_router(dijcsomag_routes.router)
 
 @app.get("/")
 def root():

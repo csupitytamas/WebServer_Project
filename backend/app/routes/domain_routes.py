@@ -10,7 +10,7 @@ router = APIRouter()
 def list_domains():
     with get_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT d_id, allapot, domain_nev, megtekintes, u_id, diju_id FROM domain")
+            cur.execute("SELECT d_id, allapot, domain_nev, megtekintes, u_id, dij_id FROM domain")
             domains = cur.fetchall()
     return [
         {
@@ -31,7 +31,7 @@ def create_domain(domain: DomainCreate, payload: dict = Depends(decode_jwt)):
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("""
-                INSERT INTO domain (allapot, domain_nev, megtekintes, u_id, diju_id)
+                INSERT INTO domain (allapot, domain_nev, megtekintes, u_id, dij_id)
                 VALUES (:1, :2, :3, :4, :5)
             """, [
                 domain.allapot,
@@ -43,7 +43,7 @@ def create_domain(domain: DomainCreate, payload: dict = Depends(decode_jwt)):
             conn.commit()
 
             cur.execute("""
-                SELECT d_id, allapot, domain_nev, megtekintes, u_id, diju_id
+                SELECT d_id, allapot, domain_nev, megtekintes, u_id, dij_id
                 FROM domain
                 WHERE d_id = (SELECT MAX(d_id) FROM domain)
             """)
@@ -60,7 +60,7 @@ def create_domain(domain: DomainCreate, payload: dict = Depends(decode_jwt)):
     }
 
 
-@router.put("/api/domains/{domain_id}", response_model=DomainOut)
+@router.put("/api/update_domain/{domain_id}", response_model=DomainOut)
 def update_domain(
     domain_id: int,
     updated_domain: DomainUpdate,
@@ -96,7 +96,7 @@ def update_domain(
 
             # Frissített adat lekérése
             cur.execute("""
-                SELECT d_id, allapot, domain_nev, megtekintes, u_id, diju_id
+                SELECT d_id, allapot, domain_nev, megtekintes, u_id, dij_id
                 FROM domain
                 WHERE d_id = :1
             """, [domain_id])
@@ -113,7 +113,7 @@ def update_domain(
     }
 
 
-@router.delete("/api/domains/{domain_id}")
+@router.delete("/api/delete_domain/{domain_id}")
 def delete_domain(domain_id: int, payload: dict = Depends(decode_jwt)):
     role = int(payload["role"])
     if role != 1:
