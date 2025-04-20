@@ -6,7 +6,7 @@
 
 	$effect(() => {
 		if ($accessToken && $accessToken !== null) {
-			goto('/home', { replaceState: true });
+			//goto('/home', { replaceState: true });
 		} else {
 			goto('/login', { replaceState: true });
 		}
