@@ -20,10 +20,11 @@ class DijcsomagUpdate(DijcsomagBase):
     max_domain: int
 
 class DijcsomagOut(DijcsomagBase):
+    d_id: int
     neve: str
     ar: int
     max_meret: int
-    max_domain: int
+    max_domain: None | int
 
     class Config:
         from_attributes = True

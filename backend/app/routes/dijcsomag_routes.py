@@ -20,8 +20,7 @@ def list_dijcsomagok():
             "ar": row[2],
             "max_meret": row[3],
             "max_domain": row[4]
-        }
-        for row in rows
+        } for row in rows
     ]
 
 
