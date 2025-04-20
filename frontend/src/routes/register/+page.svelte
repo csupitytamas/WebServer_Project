@@ -3,6 +3,8 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { PUBLIC_API_URL } from '$env/static/public';
+	import axios from 'axios';
+	import { accessToken } from '$lib/stores/auth';
 
 	let username: string = $state('');
 	let email: string = $state('');
@@ -26,28 +28,26 @@
 			jelszo: password
 		};
 
-		var response = fetch(`${PUBLIC_API_URL}/auth/register`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(data)
-		});
-
-		response
+		axios
+			.post(`${PUBLIC_API_URL}/auth/register`, JSON.stringify(data), {
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			})
 			.then((res) => {
+				console.log(res);
 				if (res.status === 200) {
-					alert('Sikeres regisztráció!');
-					res.json().then((data) => {
-						console.log(data);
-					});
+					if (res.data.access_token) {
+						$accessToken = res.data.access_token;
+						window.location.href = '/home';
+					}
 				} else {
-					alert('Hiba történt a regisztráció során!');
+					alert('Hiba történt a bejelentkezés során!');
 				}
 			})
 			.catch((error) => {
 				console.error('Error:', error);
-				alert('Hiba történt a regisztráció során!');
+				alert('Hiba történt a bejelentkezés során!');
 			});
 	}
 </script>
