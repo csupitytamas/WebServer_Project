@@ -1,5 +1,7 @@
 <script lang="ts">
 	import DomainsForm from '$lib/components/FormGeneratorElement/DomainsForm.svelte';
+	import FaqForm from '$lib/components/FormGeneratorElement/FaqForm.svelte';
+	import InvoicesForm from '$lib/components/FormGeneratorElement/InvoicesForm.svelte';
 	import PlansForm from '$lib/components/FormGeneratorElement/PlansForm.svelte';
 	import UsersForm from '$lib/components/FormGeneratorElement/UsersForm.svelte';
 	import WebstoragesForm from '$lib/components/FormGeneratorElement/WebstoragesForm.svelte';
@@ -20,6 +22,14 @@
 		{
 			name: 'Webtárhelyek',
 			component: WebstoragesForm
+		},
+		{
+			name: 'Számlák',
+			component: InvoicesForm
+		},
+		{
+			name: 'Tudástár',
+			component: FaqForm
 		}
 	];
 
