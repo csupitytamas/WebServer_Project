@@ -19,7 +19,7 @@ def list_domains():
             "domain_nev": row[2],
             "megtekintes": row[3],
             "u_id": row[4],
-            "diju_id": row[5]
+            "dij_id": row[5]
         }
         for row in domains
     ]
@@ -38,7 +38,7 @@ def create_domain(domain: DomainCreate, payload: dict = Depends(decode_jwt)):
                 domain.domain_nev,
                 domain.megtekintes,
                 user_id,
-                domain.diju_id
+                domain.dij_id
             ])
             conn.commit()
 
@@ -50,13 +50,12 @@ def create_domain(domain: DomainCreate, payload: dict = Depends(decode_jwt)):
             row = cur.fetchone()
 
     return {
-        "message": "Domain létrehozva",
         "d_id": row[0],
         "allapot": row[1],
         "domain_nev": row[2],
         "megtekintes": row[3],
         "u_id": row[4],
-        "diju_id": row[5]
+        "dij_id": row[5]
     }
 
 
@@ -72,29 +71,44 @@ def update_domain(
 
     with get_connection() as conn:
         with conn.cursor() as cur:
+
+            # Validáld, hogy a domain létezik
             cur.execute("SELECT COUNT(*) FROM domain WHERE d_id = :1", [domain_id])
             if cur.fetchone()[0] == 0:
                 raise HTTPException(status_code=404, detail="A domain nem található.")
 
+            # Validáld, hogy a felhasználó létezik
+            if updated_domain.u_id is not None:
+                cur.execute("SELECT COUNT(*) FROM felhasznalo WHERE u_id = :1", [updated_domain.u_id])
+                if cur.fetchone()[0] == 0:
+                    raise HTTPException(status_code=400, detail="A megadott felhasználó (u_id) nem létezik.")
+
+            # Validáld, hogy a díjcsomag létezik
+            if updated_domain.dij_id is not None:
+                cur.execute("SELECT COUNT(*) FROM dijcsomag WHERE d_id = :1", [updated_domain.dij_id])
+                if cur.fetchone()[0] == 0:
+                    raise HTTPException(status_code=400, detail="A megadott díjcsomag (dij_id) nem létezik.")
+
+            # Frissítés
             cur.execute("""
                 UPDATE domain
                 SET allapot = :1,
                     domain_nev = :2,
                     megtekintes = :3,
                     u_id = :4,
-                    diju_id = :5
+                    dij_id = :5
                 WHERE d_id = :6
             """, [
                 updated_domain.allapot,
                 updated_domain.domain_nev,
                 updated_domain.megtekintes,
                 updated_domain.u_id,
-                updated_domain.diju_id,
+                updated_domain.dij_id,
                 domain_id
             ])
             conn.commit()
 
-            # Frissített adat lekérése
+            # Visszaolvasás
             cur.execute("""
                 SELECT d_id, allapot, domain_nev, megtekintes, u_id, dij_id
                 FROM domain
@@ -102,16 +116,14 @@ def update_domain(
             """, [domain_id])
             row = cur.fetchone()
 
-    return {
-        "message": "Domain frissítve",
-        "d_id": row[0],
-        "allapot": row[1],
-        "domain_nev": row[2],
-        "megtekintes": row[3],
-        "u_id": row[4],
-        "diju_id": row[5]
-    }
-
+            return {
+                "d_id": row[0],
+                "allapot": row[1],
+                "domain_nev": row[2],
+                "megtekintes": row[3],
+                "u_id": row[4],
+                "dij_id": row[5]
+            }
 
 @router.delete("/api/delete_domain/{domain_id}")
 def delete_domain(domain_id: int, payload: dict = Depends(decode_jwt)):
