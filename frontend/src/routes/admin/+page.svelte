@@ -1,6 +1,8 @@
 <script lang="ts">
 	import DomainsForm from '$lib/components/FormGeneratorElement/DomainsForm.svelte';
 	import PlansForm from '$lib/components/FormGeneratorElement/PlansForm.svelte';
+	import UsersForm from '$lib/components/FormGeneratorElement/UsersForm.svelte';
+	import WebstoragesForm from '$lib/components/FormGeneratorElement/WebstoragesForm.svelte';
 
 	let menus = [
 		{
@@ -10,6 +12,14 @@
 		{
 			name: 'Díjcsomagok',
 			component: PlansForm
+		},
+		{
+			name: 'Felhasználók',
+			component: UsersForm
+		},
+		{
+			name: 'Webtárhelyek',
+			component: WebstoragesForm
 		}
 	];
 
