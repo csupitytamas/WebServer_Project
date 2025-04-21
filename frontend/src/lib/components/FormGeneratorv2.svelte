@@ -1,11 +1,8 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
-	import { PUBLIC_API_URL } from '$env/static/public';
 	import axios from 'axios';
 	import { accessToken } from '$lib/stores/auth';
-	import { on } from 'svelte/events';
 
 	let {
 		title,
@@ -33,7 +30,7 @@
 
 	function deleteItem(item: Array<{ value: string }>) {
 		const primaryKeyIndex = inputs.findIndex(
-			(input) => input.label.toLowerCase() === primaryKey.toLowerCase()
+			(input) => input.databaseName.toLowerCase() === primaryKey.toLowerCase()
 		);
 		if (primaryKeyIndex !== -1) {
 			const primaryKeyValue = item[primaryKeyIndex].value;
@@ -57,7 +54,7 @@
 
 	function findPrimaryKeyIndexValue() {
 		const primaryKeyIndex = inputs.findIndex(
-			(input) => input.label.toLowerCase() === primaryKey.toLowerCase()
+			(input) => input.databaseName.toLowerCase() === primaryKey.toLowerCase()
 		);
 		if (primaryKeyIndex !== -1) {
 			return currentItem[primaryKeyIndex].value;
