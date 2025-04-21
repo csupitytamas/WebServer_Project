@@ -32,8 +32,27 @@
 	let currentItem: Array<{ value: string }> = $state([]);
 
 	function deleteItem(item: Array<{ value: string }>) {
-		// Implement the delete logic here
-		//console.log('Deleting item:', item);
+		const primaryKeyIndex = inputs.findIndex(
+			(input) => input.label.toLowerCase() === primaryKey.toLowerCase()
+		);
+		if (primaryKeyIndex !== -1) {
+			const primaryKeyValue = item[primaryKeyIndex].value;
+			axios
+				.delete(deleteEndpoint + `/${primaryKeyValue}?token=${$accessToken}`, {
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${$accessToken}`
+					}
+				})
+				.then((response) => {
+					if (response.status === 200) {
+						alert('Sikeres törlés!');
+						onMountFunctions();
+					} else {
+						alert('Hiba történt a törlés során!');
+					}
+				});
+		}
 	}
 
 	function findPrimaryKeyIndexValue() {
@@ -147,7 +166,7 @@
 	}
 </script>
 
-<div class="mt-16 md:mt-40">
+<div class="mt-4">
 	<h1 class="mb-5 flex items-center justify-center text-2xl font-bold">{title}</h1>
 	<div class=" flex items-center justify-center">
 		<div class="grid grid-cols-2 gap-2 px-4 md:w-2/4 md:gap-4 md:px-0">

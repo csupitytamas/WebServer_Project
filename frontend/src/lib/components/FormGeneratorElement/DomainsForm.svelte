@@ -7,7 +7,6 @@
 
 	let domainsData: any[] = [];
 
-	// Definiáld a mezőket egy tömbben
 	const domainFields = [
 		{ databaseName: 'd_id', label: 'D_ID', placeholder: 'D_ID', type: 'number' },
 		{ databaseName: 'allapot', label: 'Allapot', placeholder: 'Allapot', type: 'number' },
@@ -22,14 +21,12 @@
 		{ databaseName: 'dij_id', label: 'Dij ID', placeholder: 'Dij ID', type: 'number' }
 	];
 
-	// Kezdő értékek
 	let inputDomains = domainFields.map((field) => ({
 		...field,
 		value: field.type === 'number' ? '' : ''
 	}));
 
-	// Adatok betöltése
-	async function loadDomains() {
+	async function onMountLoading() {
 		try {
 			const response = await axios.get(`${PUBLIC_API_URL}/api/get_domains`, {
 				headers: {
@@ -50,7 +47,7 @@
 		}
 	}
 
-	onMount(loadDomains);
+	onMount(onMountLoading);
 </script>
 
 <FormGeneratorv2
@@ -61,5 +58,5 @@
 	deleteEndpoint={`${PUBLIC_API_URL}/api/delete_domain`}
 	addEndpoint={`${PUBLIC_API_URL}/api/create_domain`}
 	primaryKey="d_id"
-	onMountFunctions={loadDomains}
+	onMountFunctions={onMountLoading}
 />
