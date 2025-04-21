@@ -53,7 +53,7 @@ def get_by_name(name: str):
         "szerep": row[3]
     }
 
-@router.put("/api/update_user/{user_id}")
+@router.put("/api/update_user/{user_id}" ,dependencies=[Depends(decode_jwt)])
 def update_user(user_id: int, updated_user: UserUpdate, payload: dict = Depends(decode_jwt)):
     current_user_id = int(payload["sub"])
     current_user_role = int(payload["role"])
