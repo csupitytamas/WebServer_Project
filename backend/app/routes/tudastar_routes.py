@@ -14,6 +14,7 @@ def list_tudastar():
             rows = cur.fetchall()
     return [
         {
+            "t_id": row[0],
             "kategoria": row[1],
             "kerdes_szoveg": row[2],
             "valasz_szoveg": row[3]
@@ -43,6 +44,7 @@ def create_tudastar(data: TudastarCreate, payload: dict = Depends(decode_jwt)):
             row = cur.fetchone()
 
     return {
+        "t_id": row[0],
         "kategoria": row[1],
         "kerdes_szoveg": row[2],
         "valasz_szoveg": row[3]
@@ -74,6 +76,7 @@ def update_tudastar(t_id: int, data: TudastarUpdate, payload: dict = Depends(dec
             row = cur.fetchone()
 
     return {
+        "t_id": row[0],
         "kategoria": row[1],
         "kerdes_szoveg": row[2],
         "valasz_szoveg": row[3]
