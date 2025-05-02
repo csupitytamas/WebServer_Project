@@ -18,3 +18,10 @@ class SzamlaOut(BaseModel):
     letrehozas_datuma: datetime
     u_id: Optional[int]
     all_id: Optional[int]
+
+class SzamlaOutExtended(BaseModel):
+    szamla_id: int
+    osszeg: float
+    letrehozas_datuma: str
+    all_id: int
+    allapot_nev: str

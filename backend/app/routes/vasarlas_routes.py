@@ -70,7 +70,7 @@ def vasarlas(data: VasarlasRequest, payload: dict = Depends(decode_jwt)):
                 """, [ar, user_id])
                 cur.execute("SELECT MAX(sz_id) FROM szamla")
                 szamla_id = cur.fetchone()[0]
-
+                # 6. Előfizetés létrehozása
                 cur.execute("""
                                   INSERT INTO elofizet (u_id, d_id, datum)
                                   VALUES (:1, :2, SYSTIMESTAMP)
