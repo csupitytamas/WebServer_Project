@@ -5,7 +5,6 @@ from app.db.connection import get_connection
 
 router = APIRouter()
 
-# ✅ Bárki számára elérhető lista
 @router.get("/api/tudastar", response_model=list[TudastarOut])
 def list_tudastar():
     with get_connection() as conn:
@@ -22,7 +21,6 @@ def list_tudastar():
     ]
 
 
-# 🔐 Csak admin hozhat létre
 @router.post("/api/tudastar", response_model=TudastarOut)
 def create_tudastar(data: TudastarCreate, payload: dict = Depends(decode_jwt)):
     if int(payload["role"]) != 1:
@@ -51,7 +49,7 @@ def create_tudastar(data: TudastarCreate, payload: dict = Depends(decode_jwt)):
     }
 
 
-# 🔐 Csak admin módosíthat
+
 @router.put("/api/tudastar/{t_id}", response_model=TudastarOut)
 def update_tudastar(t_id: int, data: TudastarUpdate, payload: dict = Depends(decode_jwt)):
     if int(payload["role"]) != 1:
@@ -83,7 +81,7 @@ def update_tudastar(t_id: int, data: TudastarUpdate, payload: dict = Depends(dec
     }
 
 
-# 🔐 Csak admin törölhet
+
 @router.delete("/api/tudastar/{t_id}")
 def delete_tudastar(t_id: int, payload: dict = Depends(decode_jwt)):
     if int(payload["role"]) != 1:
