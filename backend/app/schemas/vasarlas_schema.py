@@ -1,0 +1,13 @@
+from pydantic import BaseModel
+from typing import Optional, List
+
+class VasarlasRequest(BaseModel):
+    dijcsomag_id: int
+    domain_id: Optional[List[int]] = []
+    meret: Optional[int] = None
+
+class VasarlasOut(BaseModel):
+    message: str
+    szamla_id: int
+    domain_id: Optional[List[int]] = []
+    webtarhely_id: Optional[int] = None
