@@ -3,7 +3,7 @@ from typing import Optional, List
 
 class VasarlasRequest(BaseModel):
     dijcsomag_id: int
-    domain_id: Optional[List[int]] = []
+    domain_nevek: Optional[List[str]] = []
     meret: Optional[int] = None
 
 class VasarlasOut(BaseModel):

@@ -23,22 +23,35 @@ def vasarlas(data: VasarlasRequest, payload: dict = Depends(decode_jwt)):
                 ar, max_meret, max_domain = dijcsomag
 
                 # 2. Domainek ellenőrzése
-                if len(data.domain_id) > max_domain:
-                    raise HTTPException(status_code=400, detail="Több domaint választottál, mint amennyit a csomag enged")
+                if len(data.domain_nevek) > max_domain:
+                    raise HTTPException(status_code=400,
+                                        detail="Több domaint választottál, mint amennyit a csomag enged")
 
-                for domain_id in data.domain_id:
-                    cur.execute("SELECT allapot FROM domain WHERE d_id = :1", [domain_id])
-                    result = cur.fetchone()
-                    if not result or result[0] != 0:
-                        raise HTTPException(status_code=400, detail=f"A(z) {domain_id} azonosítójú domain már foglalt")
+                    # Lekérjük a domainek azonosítóit a neveik alapján
+                cur.execute(
+                    f"""
+                                    SELECT d_id, domain_nev, allapot FROM domain
+                                    WHERE domain_nev IN ({','.join([':{}'.format(i + 1) for i in range(len(data.domain_nevek))])})
+                                    """,
+                    data.domain_nevek
+                )
+                domain_results = cur.fetchall()
+                if len(domain_results) != len(data.domain_nevek):
+                    raise HTTPException(status_code=404, detail="Egy vagy több megadott domain nem található")
 
-                # 3. Domainek frissítése
-                for domain_id in data.domain_id:
+                domain_ids = []
+                for row in domain_results:
+                    d_id, domain_nev, allapot = row
+                    if allapot != 0:
+                        raise HTTPException(status_code=400, detail=f"A(z) {domain_nev} domain már foglalt")
+                    domain_ids.append(d_id)
+
+                for domain_id in domain_ids:
                     cur.execute("""
-                        UPDATE domain
-                        SET allapot = 1, u_id = :1, dij_id = :2
-                        WHERE d_id = :3
-                    """, [user_id, data.dijcsomag_id, domain_id])
+                                        UPDATE domain
+                                        SET allapot = 1, u_id = :1, dij_id = :2
+                                        WHERE d_id = :3
+                                    """, [user_id, data.dijcsomag_id, domain_id])
 
                 # 4. Webtárhely kiválasztása meglévőkből (ha kér tárhelyet)
                 webtarhely_id = None
