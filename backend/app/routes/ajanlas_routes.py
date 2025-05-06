@@ -25,4 +25,10 @@ def get_ajanlas(payload: dict = Depends(decode_jwt)):
                     "max_meret": int(row[4])
                 }
             else:
-                raise HTTPException(status_code=200, detail="Nincs elérhető ajánlás.")
+                return {
+                    "d_id": None,
+                    "nev": "Nincs ajánlás",
+                    "ar": 0.0,
+                    "max_domain": 0,
+                    "max_meret": 0
+                }
