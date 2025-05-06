@@ -3,7 +3,7 @@ from app.db.connection import get_connection
 from app.utils.jwt_helper import decode_jwt
 from app.schemas.ajanlas_schema import AjanlasOut
 
-router = APIRouter
+router = APIRouter()
 
 @router.get("/api/ajanlas", response_model=AjanlasOut)
 def get_ajanlas(payload: dict = Depends(decode_jwt)):
@@ -25,4 +25,4 @@ def get_ajanlas(payload: dict = Depends(decode_jwt)):
                     "max_meret": int(row[4])
                 }
             else:
-                raise HTTPException(status_code=404, detail="Nincs elérhető ajánlás.")
+                raise HTTPException(status_code=200, detail="Nincs elérhető ajánlás.")
