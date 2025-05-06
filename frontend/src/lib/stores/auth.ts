@@ -10,9 +10,23 @@ const initial =
 		: null;
 
 export const accessToken: Writable<string | null> = writable(initial);
+export const isAdmin: Writable<boolean> = writable(false);
 
 if (isBrowser) {
 	accessToken.subscribe((value) => {
 		localStorage.setItem(STORAGE_KEY, value ?? '');
+		decodeJWT(value);
 	});
+}
+
+function decodeJWT(token: string | null) {
+	if (token) {
+		const payload = token.split('.')[1];
+		if (payload) {
+			const decodedPayload = JSON.parse(atob(payload));
+			isAdmin.set(decodedPayload.role);
+		}
+	} else {
+		isAdmin.set(false);
+	}
 }
