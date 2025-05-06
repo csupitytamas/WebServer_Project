@@ -25,7 +25,7 @@ def get_havi_bevetel(payload: dict = Depends(decode_jwt)):
 def get_legtobbet_fizetok(payload: dict = Depends(decode_jwt)):
     with get_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT felhasznalo_nev, osszes_fizetes FROM egtobbet_fizetok")
+            cur.execute("SELECT felhasznalo_nev, osszes_fizetes FROM legtobbet_fizetok")
             rows = cur.fetchall()
             return [{"felhasznalo": row[0], "osszeg": float(row[1])} for row in rows]
 
