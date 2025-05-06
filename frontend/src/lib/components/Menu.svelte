@@ -25,6 +25,7 @@
 		{/if}
 		<a href="/profile" class="text-blue-400 underline">Profil</a>
 		<a href="/faq" class="text-blue-400 underline">Gyakori kérdések</a>
+		<a href="/stats" class="text-blue-400 underline">Statisztikák</a>
 	</div>
 	<button onclick={logout} class="text-blue-400 underline">Kijelentkezés</button>
 </div>
