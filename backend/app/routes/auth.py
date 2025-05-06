@@ -47,6 +47,9 @@ def login(login_data: UserLogin):
             if not verify_password(login_data.jelszo, hashed_password):
                 raise HTTPException(status_code=400, detail="Hibás email vagy jelszó")
 
+            cur.execute("BEGIN bejelentkezes_idopont_frissitese(:1); END;", [user_id])
+            conn.commit()
+
     token = create_access_token({"sub": str(user_id), "role": szerep})
     return {
         "message": "Sikeres bejelentkezés",

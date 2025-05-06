@@ -22,27 +22,17 @@ def vasarlas(data: VasarlasRequest, payload: dict = Depends(decode_jwt)):
 
                 ar, max_meret, max_domain = dijcsomag
 
-                # 2. LÉTEZŐ DOMAIN NEVEK ELLENŐRZÉSE
-                cur.execute(f"""
-                                   SELECT domain_nev FROM domain
-                                   WHERE domain_nev IN ({','.join([':{}'.format(i + 1) for i in range(len(data.domain_nevek))])})
-                               """, data.domain_nevek)
-                letezo = [row[0] for row in cur.fetchall()]
-                if letezo:
-                    raise HTTPException(status_code=400,
-                                        detail=f"A következő domainek már léteznek: {', '.join(letezo)}")
-
-                # 3. ÚJ DOMAINEK LÉTREHOZÁSA
+                # 2. ÚJ DOMAINEK LÉTREHOZÁSA (trigger ellenőrzi az egyediségüket)
                 domain_ids = []
                 for nev in data.domain_nevek:
                     cur.execute("""
-                                       INSERT INTO domain (allapot, domain_nev, megtekintes, u_id, dij_id)
-                                       VALUES (1, :1, 0, :2, :3)
-                                   """, [nev, user_id, data.dijcsomag_id])
+                        INSERT INTO domain (allapot, domain_nev, megtekintes, u_id, dij_id)
+                        VALUES (1, :1, 0, :2, :3)
+                    """, [nev, user_id, data.dijcsomag_id])
                     cur.execute("SELECT MAX(d_id) FROM domain")
                     domain_ids.append(cur.fetchone()[0])
 
-                # 4. Webtárhely kiválasztása meglévőkből (ha kér tárhelyet)
+                # 3. Webtárhely kiválasztása meglévőkből (ha kér tárhelyet)
                 webtarhely_id = None
                 if data.meret:
                     if data.meret > max_meret:
@@ -65,28 +55,30 @@ def vasarlas(data: VasarlasRequest, payload: dict = Depends(decode_jwt)):
                         WHERE w_id = :4
                     """, [user_id, data.dijcsomag_id, data.meret, webtarhely_id])
 
-                # 5. Számla létrehozása (állapot: 3 = Függőben)
+                # 4. Előfizetés létrehozása → trigger automatikusan létrehozza a számlát
                 cur.execute("""
-                    INSERT INTO szamla (osszeg, letrehozas_datuma, u_id, all_id)
-                    VALUES (:1, SYSTIMESTAMP, :2, 3)
-                """, [ar, user_id])
-                cur.execute("SELECT MAX(sz_id) FROM szamla")
+                    INSERT INTO elofizet (u_id, d_id, datum)
+                    VALUES (:1, :2, SYSTIMESTAMP)
+                """, [user_id, data.dijcsomag_id])
+
+                # 5. Visszakeressük a legutóbbi számla ID-t az adott felhasználóhoz
+                cur.execute("""
+                    SELECT MAX(sz_id)
+                    FROM szamla
+                    WHERE u_id = :1
+                """, [user_id])
                 szamla_id = cur.fetchone()[0]
-                # 6. Előfizetés létrehozása
-                cur.execute("""
-                                  INSERT INTO elofizet (u_id, d_id, datum)
-                                  VALUES (:1, :2, SYSTIMESTAMP)
-                              """, [user_id, data.dijcsomag_id])
 
                 conn.commit()
 
                 return VasarlasOut(
                     message="A vásárlás sikeresen megtörtént.",
                     szamla_id=szamla_id,
-                    domain_id=data.domain_id,
+                    domain_ids=domain_ids,
                     webtarhely_id=webtarhely_id
                 )
 
             except Exception as e:
                 conn.rollback()
                 raise HTTPException(status_code=500, detail=f"Hiba a vásárlás során: {str(e)}")
+

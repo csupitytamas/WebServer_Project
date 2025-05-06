@@ -94,3 +94,4 @@ def delete_user(user_id: int, payload: dict = Depends(decode_jwt)):
             conn.commit()
 
     return {"message": "Felhasználó törölve"}
+
