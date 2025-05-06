@@ -39,21 +39,12 @@ def get_legnezettebb_domain(payload: dict = Depends(decode_jwt)):
             return [{"domain": row[0], "tulajdonos": row[1], "megtekintes": int(row[2])} for row in rows]
 
 
-@router.get("/api/legaktivabb-felhasznalok", response_model=List[LegaktivabbFelhasznalo])
+@router.get("/api/legaktivabb-felhasznalok", response_model=List[str])
 def get_legaktivabb_felhasznalok(payload: dict = Depends(decode_jwt)):
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("""
-                SELECT felhasznalo, domainek_szama, webtarhelyek_szama, szamlak_szama
-                FROM legaktivabb_felhasznalok
+                SELECT felhasznalo FROM legaktivabb_felhasznalok
             """)
             rows = cur.fetchall()
-            return [
-                {
-                    "felhasznalo": row[0],
-                    "domainek": int(row[1]),
-                    "webtarhelyek": int(row[2]),
-                    "szamlak": int(row[3])
-                }
-                for row in rows
-            ]
+            return [row[0] for row in rows]
