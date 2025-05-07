@@ -123,7 +123,7 @@
 			{#if userData}
 				{#each userData.elofizetesek as elofizetes}
 					<p>Azonosító: {elofizetes.dijcsomag_id}</p>
-					<p>Dátum: {elofizetes.nev}</p>
+					<p>Előfizetés neve: {elofizetes.nev}</p>
 					<hr />
 				{/each}
 			{:else}
