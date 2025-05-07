@@ -37,7 +37,7 @@
 	]);
 	onMount(() => {
 		axios
-			.get(`${PUBLIC_API_URL}/api/stats/havi-bevetel?token=${$accessToken}`, {
+			.get(`${PUBLIC_API_URL}/api/havi-bevetel?token=${$accessToken}`, {
 				headers: {
 					Authorization: `Bearer ${$accessToken}`,
 					'Content-Type': 'application/json'
@@ -48,7 +48,7 @@
 			});
 
 		axios
-			.get(`${PUBLIC_API_URL}/api/stats/legtobbet-fizetok?token=${$accessToken}`, {
+			.get(`${PUBLIC_API_URL}/api/legtobbet-fizetok?token=${$accessToken}`, {
 				headers: {
 					Authorization: `Bearer ${$accessToken}`,
 					'Content-Type': 'application/json'
@@ -59,7 +59,7 @@
 			});
 
 		axios
-			.get(`${PUBLIC_API_URL}/api/stats/legnezettebb-domain?token=${$accessToken}`, {
+			.get(`${PUBLIC_API_URL}/api/legnezettebb-domain?token=${$accessToken}`, {
 				headers: {
 					Authorization: `Bearer ${$accessToken}`,
 					'Content-Type': 'application/json'
@@ -70,7 +70,7 @@
 			});
 
 		axios
-			.get(`${PUBLIC_API_URL}/api/stats/legaktivabb-felhasznalok?token=${$accessToken}`, {
+			.get(`${PUBLIC_API_URL}/api/legaktivabb-felhasznalok?token=${$accessToken}`, {
 				headers: {
 					Authorization: `Bearer ${$accessToken}`,
 					'Content-Type': 'application/json'
