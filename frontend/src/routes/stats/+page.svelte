@@ -154,18 +154,12 @@
 			<thead>
 				<tr>
 					<th class="border border-gray-300 px-4 py-2">Felhasználó</th>
-					<th class="border border-gray-300 px-4 py-2">Domainjeim</th>
-					<th class="border border-gray-300 px-4 py-2">Webtárhelyeim</th>
-					<th class="border border-gray-300 px-4 py-2">Számláim</th>
 				</tr>
 			</thead>
 			<tbody>
-				{#each mostActiveUsers as { felhasznalo, domainjeim, webtarhelyeim, szamlak }}
+				{#each mostActiveUsers as felhasznalo}
 					<tr>
 						<td class="border border-gray-300 px-4 py-2">{felhasznalo}</td>
-						<td class="border border-gray-300 px-4 py-2">{domainjeim}</td>
-						<td class="border border-gray-300 px-4 py-2">{webtarhelyeim}</td>
-						<td class="border border-gray-300 px-4 py-2">{szamlak}</td>
 					</tr>
 				{/each}
 			</tbody>
