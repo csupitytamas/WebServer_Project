@@ -39,9 +39,10 @@ def create_szamla(data: SzamlaCreate, payload: dict = Depends(decode_jwt)):
             """, [data.osszeg, user_id, data.all_id])
             conn.commit()
             cur.execute("""
-                SELECT sz_id, osszeg, letrehozas_datuma, u_id, all_id
-                FROM szamla
-                WHERE sz_id = (SELECT MAX(sz_id) FROM szamla)
+                SELECT s.sz_id, s.osszeg, s.letrehozas_datuma, s.u_id, s.all_id, a.allapot_nev
+                FROM szamla s
+                JOIN allapot_tabla a ON s.all_id = a.all_id
+                WHERE s.sz_id = (SELECT MAX(sz_id) FROM szamla)
             """)
             row = cur.fetchone()
 

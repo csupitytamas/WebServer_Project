@@ -39,8 +39,11 @@ def vasarlas(data: VasarlasRequest, payload: dict = Depends(decode_jwt)):
                         raise HTTPException(status_code=400, detail="Túl nagy webtárhelyet igényeltél")
 
                     cur.execute("""
-                        SELECT w_id FROM webtarhely
-                        WHERE allapot = 0 AND meret >= :1
+                        SELECT w.w_id
+                        FROM webtarhely w
+                        JOIN allapot_tabla a ON w.all_id = a.all_id
+                        WHERE w.allapot = 0 AND w.meret >= :1
+                        ORDER BY w.meret
                         FETCH FIRST 1 ROWS ONLY
                     """, [data.meret])
                     result = cur.fetchone()

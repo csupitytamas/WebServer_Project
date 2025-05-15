@@ -1,3 +1,12 @@
+
+Futtatás:
+
+```bash
+cd backend
+uvicorn app.main:app --reload
+```
+
+
 # FastAPI Project
 
 This is a FastAPI-based project with JWT authentication middleware. The project includes protected routes under `/api` that require authentication and public routes accessible without authentication.

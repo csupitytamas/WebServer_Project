@@ -41,10 +41,11 @@ def get_my_adatok(payload: dict = Depends(decode_jwt)):
 
 
             cur.execute("""
-                SELECT d.d_id, d.neve
-                FROM elofizet e
-                JOIN dijcsomag d ON e.d_id = d.d_id
-                WHERE e.u_id = :1
+            SELECT d.d_id, d.neve
+            FROM elofizet e
+            JOIN dijcsomag d ON e.d_id = d.d_id
+            WHERE e.u_id = :1
+            ORDER BY d.neve
                       """, [user_id])
             elofizetesek = [ {"dijcsomag_id": row[0], "nev": row[1]}
                  for row in cur.fetchall()
