@@ -8,6 +8,6 @@ class VasarlasRequest(BaseModel):
 
 class VasarlasOut(BaseModel):
     message: str
-    szamla_id: int
+    szamla_id: Optional[int] = None
     domain_ids: Optional[List[int]] = []
     webtarhely_id: Optional[int] = None
