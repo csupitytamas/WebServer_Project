@@ -32,6 +32,8 @@ def vasarlas(data: VasarlasRequest, payload: dict = Depends(decode_jwt)):
                     cur.execute("SELECT MAX(d_id) FROM domain")
                     domain_ids.append(cur.fetchone()[0])
 
+                    conn.commit()
+
                 # 3. Webtárhely kiválasztása meglévőkből (ha kér tárhelyet)
                 webtarhely_id = None
                 if data.meret:
@@ -57,6 +59,8 @@ def vasarlas(data: VasarlasRequest, payload: dict = Depends(decode_jwt)):
                         SET allapot = 1, u_id = :1, d_id = :2, meret = :3
                         WHERE w_id = :4
                     """, [user_id, data.dijcsomag_id, data.meret, webtarhely_id])
+
+                    conn.commit()
 
                 # 4. Előfizetés létrehozása → trigger automatikusan létrehozza a számlát
                 cur.execute("""
