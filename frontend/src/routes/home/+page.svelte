@@ -41,7 +41,7 @@
 				{
 					dijcsomag_id: selectedPlanId,
 					domain_nevek: domainsInputs,
-					meret: 0
+					meret: $plans?.find((e) => e.d_id == selectedPlanId)?.max_meret
 				},
 				{
 					headers: {
