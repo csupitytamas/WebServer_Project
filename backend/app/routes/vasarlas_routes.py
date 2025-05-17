@@ -34,7 +34,7 @@ def vasarlas(data: VasarlasRequest, payload: dict = Depends(decode_jwt)):
                     print(f"Domain beszúrás: {nev}")
                     cur.execute("""
                         INSERT INTO domain (allapot, domain_nev, megtekintes, u_id, dij_id)
-                        VALUES (1, :1, 0, :2, :3)
+                        VALUES (1, :1, 1, :2, :3)
                     """, [nev, user_id, data.dijcsomag_id])
                     conn.commit()
 
