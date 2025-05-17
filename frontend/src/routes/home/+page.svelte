@@ -40,7 +40,7 @@
 				`${PUBLIC_API_URL}/api/vasarlas?token=${$accessToken}`,
 				{
 					dijcsomag_id: selectedPlanId,
-					domain_id: domainsInputs,
+					domain_nevek: domainsInputs,
 					meret: 0
 				},
 				{
