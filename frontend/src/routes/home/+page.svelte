@@ -19,8 +19,6 @@
 			.then((response) => {
 				$plans = response.data;
 			});
-
-		suggestPlan();
 	});
 
 	$inspect($plans);
