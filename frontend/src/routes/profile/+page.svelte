@@ -25,6 +25,7 @@
 			})
 			.then((response) => {
 				userData = response.data;
+				console.log(userData);
 			});
 		const userId = getUserIdFromJWT($accessToken);
 
@@ -93,7 +94,7 @@
 	<div class="w-lg w-full rounded-lg bg-white p-6 shadow-md">
 		<h2 class="text-2xl font-bold">Webtárhely méret</h2>
 
-		{#if userData && userData.ossz_webtarhely_meret}
+		{#if userData}
 			<p>{userData.ossz_webtarhely_meret} MB</p>
 		{:else}
 			<p>Nincsenek webtárhely adatok.</p>
