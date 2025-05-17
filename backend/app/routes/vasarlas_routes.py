@@ -52,13 +52,14 @@ def vasarlas(data: VasarlasRequest, payload: dict = Depends(decode_jwt)):
                 if data.meret:
                     if data.meret > max_meret:
                         raise HTTPException(status_code=400, detail="Túl nagy tárhelyet igényeltél")
+                    
                     cur.execute("""
-                        SELECT w_id FROM webtarhely
-                        WHERE allapot = 0 AND meret >= :1
-                        JOIN allapot_tabla a ON w.all_id = a.all_id
-                        ORDER BY meret
-                        FETCH FIRST 1 ROWS ONLY
-                    """, [data.meret])
+                            SELECT w_id
+                            FROM webtarhely 
+                            WHERE meret >= :1
+                            ORDER BY meret
+                        """, [data.meret])
+
                     result = cur.fetchone()
                     if not result:
                         raise HTTPException(status_code=404, detail="Nincs megfelelő szabad tárhely.")
